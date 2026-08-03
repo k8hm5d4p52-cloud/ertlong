@@ -1,7 +1,6 @@
 // Supabase REST API client - no @supabase/supabase-js needed
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-const SUPABASE_ANON_KEY = proces…_KEY || "";
-
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const SUPABASE_ANON_KEY = *** || "";
 export type DbProduct = {
   id: string;
   name: string;
