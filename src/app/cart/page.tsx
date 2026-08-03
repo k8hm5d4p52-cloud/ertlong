@@ -33,7 +33,7 @@ function CartContent() {
     const msg = encodeURIComponent(
       `🛒 *ERTLONG ORDER*\n\n*Items:*\n${itemsList}\n\n*Total:* $${totalPrice}\n\n*Shipping Details:*\nName: ${shipping.name}\nEmail: ${shipping.email}\nAddress: ${shipping.address}, ${shipping.city}, ${shipping.country} ${shipping.zip}\nPhone: ${shipping.phone}\n\nNote: ${shipping.note}`
     );
-    window.open(`https://wa.me/12345678900?text=${msg}`, "_blank");
+    window.open(`https://wa.me/13420352140?text=${msg}`, "_blank");
     setCheckoutStep("done");
   };
 
