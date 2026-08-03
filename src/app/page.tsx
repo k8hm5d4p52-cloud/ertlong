@@ -2,10 +2,11 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
 import { CartProvider } from "@/context/CartContext";
-import { products } from "@/data/products";
+import { getProducts } from "@/data/products";
 
-export default function HomePage() {
-  const inStock = products.filter((p) => p.category === "in-stock");
+export default async function HomePage() {
+  const allProducts = await getProducts();
+  const inStock = allProducts.filter((p) => p.category === "in-stock");
 
   return (
     <CartProvider>

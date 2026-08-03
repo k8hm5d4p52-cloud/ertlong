@@ -3,11 +3,23 @@
 import Link from "next/link";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Header() {
   const { totalItems } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = () => {
+      if (typeof window !== "undefined") {
+        setIsAdmin(localStorage.getItem("ertlong_admin") === "true");
+      }
+    };
+    checkAdmin();
+    window.addEventListener("storage", checkAdmin);
+    return () => window.removeEventListener("storage", checkAdmin);
+  }, []);
 
   return (
     <header style={{
@@ -60,6 +72,19 @@ export default function Header() {
               {label}
             </Link>
           ))}
+          {/* Admin Link */}
+          {isAdmin && (
+            <Link href="/admin/dashboard" style={{
+              color: "#ff3d00",
+              textDecoration: "none",
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+            }}>
+              Admin
+            </Link>
+          )}
         </div>
 
         {/* Cart */}
@@ -135,6 +160,18 @@ export default function Header() {
               {label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link href="/admin/dashboard" onClick={() => setMobileOpen(false)} style={{
+              color: "#ff3d00",
+              textDecoration: "none",
+              fontSize: 14,
+              fontWeight: 700,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+            }}>
+              Admin
+            </Link>
+          )}
         </div>
       )}
 

@@ -1,12 +1,14 @@
 import Header from "@/components/Header";
 import ProductGrid from "@/components/ProductGrid";
 import { CartProvider } from "@/context/CartContext";
-import { products } from "@/data/products";
+import { getProducts } from "@/data/products";
 
-export default function ProductsPage() {
-  const inStock = products.filter((p) => p.category === "in-stock");
-  const restocking = products.filter((p) => p.category === "restocking");
-  const discontinued = products.filter((p) => p.category === "discontinued");
+export default async function ProductsPage() {
+  const allProducts = await getProducts();
+
+  const inStock = allProducts.filter((p) => p.category === "in-stock");
+  const restocking = allProducts.filter((p) => p.category === "restocking");
+  const discontinued = allProducts.filter((p) => p.category === "discontinued");
 
   return (
     <CartProvider>

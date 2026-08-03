@@ -1,13 +1,47 @@
 import { Product } from "@/types";
+import { supabase, DbProduct } from "@/lib/supabase";
 
-export const products: Product[] = [
+function toProduct(row: DbProduct): Product {
+  return {
+    id: row.id,
+    name: row.name,
+    price: Number(row.price),
+    description: row.description || "",
+    images: row.images || [],
+    sizes: row.sizes || [],
+    colors: row.colors || [],
+    // Treat active products as in-stock; inactive as discontinued
+    category: row.active ? "in-stock" : "discontinued",
+    stock: 0,
+  };
+}
+
+export async function getProducts(): Promise<Product[]> {
+  if (!supabase) {
+    console.warn("[ertlong] Supabase not configured — returning empty product list.");
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("[ertlong] Failed to fetch products:", error.message);
+    return [];
+  }
+
+  return (data as DbProduct[]).map(toProduct);
+}
+
+// Fallback static products for build-time / SSR when Supabase is not yet configured
+export const STATIC_PRODUCTS: Product[] = [
   {
     id: "ow-001",
     name: "Oversized Logo Tee",
     price: 45,
-    images: [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80",
-    ],
+    images: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80"],
     category: "in-stock",
     sizes: ["S", "M", "L", "XL", "XXL"],
     colors: ["Black", "White", "Grey"],
@@ -18,9 +52,7 @@ export const products: Product[] = [
     id: "hw-002",
     name: "Heavyweight Hoodie",
     price: 85,
-    images: [
-      "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80",
-    ],
+    images: ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80"],
     category: "in-stock",
     sizes: ["S", "M", "L", "XL"],
     colors: ["Black", "Charcoal", "Navy"],
@@ -31,9 +63,7 @@ export const products: Product[] = [
     id: "cj-003",
     name: "Cargo Joggers",
     price: 68,
-    images: [
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&q=80",
-    ],
+    images: ["https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&q=80"],
     category: "in-stock",
     sizes: ["S", "M", "L", "XL", "XXL"],
     colors: ["Black", "Olive", "Sand"],
@@ -44,9 +74,7 @@ export const products: Product[] = [
     id: "cd-004",
     name: "Chain Detail Jacket",
     price: 120,
-    images: [
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&q=80",
-    ],
+    images: ["https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&q=80"],
     category: "restocking",
     sizes: ["M", "L", "XL"],
     colors: ["Black"],
@@ -57,9 +85,7 @@ export const products: Product[] = [
     id: "ss-005",
     name: "Street Snap Shirt",
     price: 52,
-    images: [
-      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&q=80",
-    ],
+    images: ["https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&q=80"],
     category: "in-stock",
     sizes: ["S", "M", "L", "XL"],
     colors: ["White", "Black", "Blue"],
@@ -70,9 +96,7 @@ export const products: Product[] = [
     id: "bp-006",
     name: "Bomber Pilot Jacket",
     price: 135,
-    images: [
-      "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80",
-    ],
+    images: ["https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80"],
     category: "restocking",
     sizes: ["M", "L", "XL"],
     colors: ["Black", "Navy"],
@@ -83,9 +107,7 @@ export const products: Product[] = [
     id: "dt-007",
     name: "Distressed Tee",
     price: 38,
-    images: [
-      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&q=80",
-    ],
+    images: ["https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&q=80"],
     category: "in-stock",
     sizes: ["S", "M", "L", "XL", "XXL"],
     colors: ["Black", "White"],
@@ -96,9 +118,7 @@ export const products: Product[] = [
     id: "wc-008",
     name: "Wide Leg Cargo",
     price: 75,
-    images: [
-      "https://images.unsplash.com/photo-1604176354204-9268737828e4?w=800&q=80",
-    ],
+    images: ["https://images.unsplash.com/photo-1604176354204-9268737828e4?w=800&q=80"],
     category: "discontinued",
     sizes: ["S", "M", "L"],
     colors: ["Black", "Khaki"],
