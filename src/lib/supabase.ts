@@ -1,6 +1,4 @@
-// Supabase REST API client - no @supabase/supabase-js needed
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const SUPABASE_ANON_KEY = *** || "";
+// Local storage product store - no external DB needed
 export type DbProduct = {
   id: string;
   name: string;
@@ -14,43 +12,87 @@ export type DbProduct = {
   updated_at: string;
 };
 
-// Chainable query builder
-function queryBuilder(table: string) {
-  let url = `${SUPABASE_URL}/rest/v1/${table}`;
-  const headers = () => ({
-    apikey: SUPABASE_ANON_KEY,
-    Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-    "Content-Type": "application/json",
-    Prefer: "return=representation",
-  });
+const STORAGE_KEY = "***";
 
-  return {
-    select: (cols = "*") => ({ ...queryBuilder(table), _select: cols, _url: url + `?select=${cols}` }),
-    eq: (k: string, v: string) => { url += `&${k}=${v}`; return queryBuilder(table); },
-    order: (col: string, o = "desc") => { url += `&order=${col}.${o}`; return queryBuilder(table); },
-    then: (fn: (data: unknown) => void) => {
-      if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return fn({ data: [], error: { message: "Not configured" } });
-      return fetch(url, { headers: headers() }).then(r => r.ok ? r.json().then(d => fn({ data: d, error: null })) : fn({ data: [], error: { message: `HTTP ${r.status}` } }));
-    },
-    insert: (body: unknown) => {
-      return fetch(`${SUPABASE_URL}/rest/v1/${table}`, { method: "POST", headers: headers(), body: JSON.stringify(body) }).then(r => r.json()).then(d => ({ data: d, error: r.ok ? null : { message: d.message } }));
-    },
-    update: (body: unknown) => {
-      return fetch(url, { method: "PATCH", headers: headers(), body: JSON.stringify(body) }).then(r => r.json()).then(d => ({ data: d, error: r.ok ? null : { message: d.message } }));
-    },
-    delete: () => {
-      return fetch(url, { method: "DELETE", headers: headers() }).then(r => r.ok ? r.json() : { error: { message: `HTTP ${r.status}` } }).then(d => ({ data: d, error: null }));
-    },
-  };
+function delay(ms: number) {
+  return new Promise<void>((r) => setTimeout(r, ms));
 }
 
 export const supabase = {
-  from: (table: string) => ({
-    select: (cols = "*") => queryBuilder(table).select(cols),
-    insert: (body: unknown) => queryBuilder(table).insert([body]),
-    update: (body: unknown) => queryBuilder(table).update(body),
-    delete: () => queryBuilder(table).delete(),
-    then: (fn: (data: unknown) => void) => queryBuilder(table).then(fn),
+  from: (_table: string) => ({
+    select: (_cols = "*") => ({
+      order: () => ({
+        then: (fn: (result: { data: DbProduct[] | null; error: { message: string } | null }) => void) => {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            const products: DbProduct[] = raw ? JSON.parse(raw) : [];
+            products.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            fn({ data: products, error: null });
+          } catch {
+            fn({ data: [], error: { message: "Failed to read from localStorage" } });
+          }
+        },
+      }),
+    }),
+    insert: (payload: unknown) => ({
+      then: (fn: (result: { data: unknown[] | null; error: { message: string } | null }) => void) => {
+        delay(200).then(() => {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            const products: DbProduct[] = raw ? JSON.parse(raw) : [];
+            const newProduct: DbProduct = {
+              ...(payload as Record<string, unknown>),
+              id: crypto.randomUUID(),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            };
+            products.unshift(newProduct);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+            fn({ data: [newProduct], error: null });
+          } catch {
+            fn({ data: null, error: { message: "Failed to save" } });
+          }
+        });
+      },
+    }),
+    update: (payload: Record<string, unknown>) => ({
+      eq: (_key: string, id: string) => ({
+        then: (fn: (result: { data: unknown[] | null; error: { message: string } | null }) => void) => {
+          delay(200).then(() => {
+            try {
+              const raw = localStorage.getItem(STORAGE_KEY);
+              const products: DbProduct[] = raw ? JSON.parse(raw) : [];
+              const idx = products.findIndex((p) => p.id === id);
+              if (idx !== -1) {
+                products[idx] = { ...products[idx], ...payload, updated_at: new Date().toISOString() };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+                fn({ data: [products[idx]], error: null });
+              } else {
+                fn({ data: null, error: { message: "Product not found" } });
+              }
+            } catch {
+              fn({ data: null, error: { message: "Failed to update" } });
+            }
+          });
+        },
+      }),
+    }),
+    delete: () => ({
+      eq: (_key: string, id: string) => ({
+        then: (fn: (result: { data: unknown[] | null; error: { message: string } | null }) => void) => {
+          delay(200).then(() => {
+            try {
+              const raw = localStorage.getItem(STORAGE_KEY);
+              const products: DbProduct[] = raw ? JSON.parse(raw) : [];
+              const filtered = products.filter((p) => p.id !== id);
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+              fn({ data: [], error: null });
+            } catch {
+              fn({ data: null, error: { message: "Failed to delete" } });
+            }
+          });
+        },
+      }),
+    }),
   }),
-  then: (fn: (data: unknown) => void) => fn({ data: null }),
 };
