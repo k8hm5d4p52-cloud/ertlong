@@ -1,0 +1,108 @@
+import { Product } from "@/types";
+
+export const products: Product[] = [
+  {
+    id: "ow-001",
+    name: "Oversized Logo Tee",
+    price: 45,
+    images: [
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80",
+    ],
+    category: "in-stock",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    colors: ["Black", "White", "Grey"],
+    stock: 12,
+    description: "Heavyweight 280gsm cotton. Drop shoulders. Embroidered logo.",
+  },
+  {
+    id: "hw-002",
+    name: "Heavyweight Hoodie",
+    price: 85,
+    images: [
+      "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80",
+    ],
+    category: "in-stock",
+    sizes: ["S", "M", "L", "XL"],
+    colors: ["Black", "Charcoal", "Navy"],
+    stock: 8,
+    description: "400gsm brushed fleece. Kangaroo pocket. Ribbed cuffs.",
+  },
+  {
+    id: "cj-003",
+    name: "Cargo Joggers",
+    price: 68,
+    images: [
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&q=80",
+    ],
+    category: "in-stock",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    colors: ["Black", "Olive", "Sand"],
+    stock: 5,
+    description: "Ripstop nylon. 6 pockets. Elastic waist with drawcord.",
+  },
+  {
+    id: "cd-004",
+    name: "Chain Detail Jacket",
+    price: 120,
+    images: [
+      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&q=80",
+    ],
+    category: "restocking",
+    sizes: ["M", "L", "XL"],
+    colors: ["Black"],
+    stock: 0,
+    description: "Faux leather. Removable chain detail. Zip + snap closure.",
+  },
+  {
+    id: "ss-005",
+    name: "Street Snap Shirt",
+    price: 52,
+    images: [
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&q=80",
+    ],
+    category: "in-stock",
+    sizes: ["S", "M", "L", "XL"],
+    colors: ["White", "Black", "Blue"],
+    stock: 9,
+    description: "Oxford weave cotton. Chest pocket. Relaxed fit.",
+  },
+  {
+    id: "bp-006",
+    name: "Bomber Pilot Jacket",
+    price: 135,
+    images: [
+      "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80",
+    ],
+    category: "restocking",
+    sizes: ["M", "L", "XL"],
+    colors: ["Black", "Navy"],
+    stock: 0,
+    description: "Satin nylon shell. Quilted lining. Rib collar and cuffs.",
+  },
+  {
+    id: "dt-007",
+    name: "Distressed Tee",
+    price: 38,
+    images: [
+      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&q=80",
+    ],
+    category: "in-stock",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    colors: ["Black", "White"],
+    stock: 15,
+    description: "Vintage wash. Front pocket. Raw hem finish.",
+  },
+  {
+    id: "wc-008",
+    name: "Wide Leg Cargo",
+    price: 75,
+    images: [
+      "https://images.unsplash.com/photo-1604176354204-9268737828e4?w=800&q=80",
+    ],
+    category: "discontinued",
+    sizes: ["S", "M", "L"],
+    colors: ["Black", "Khaki"],
+    stock: 0,
+    description: "Wide leg silhouette. 8 pockets. Belt loop waist.",
+  },
+];
